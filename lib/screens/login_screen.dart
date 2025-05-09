@@ -23,7 +23,7 @@ class _LoginScreenState extends State<LoginScreen> {
     String email = emailController.text;
     String password = passwordController.text;
 
-    final url = Uri.parse('https://aeab-2409-40d2-100c-306b-10c7-3851-9d3d-f5c.ngrok-free.app/login');
+    final url = Uri.parse('https://09f6-152-58-96-35.ngrok-free.app/login');
 
     try {
       final response = await http.post(
@@ -39,7 +39,40 @@ class _LoginScreenState extends State<LoginScreen> {
         final prefs = await SharedPreferences.getInstance();
         await prefs.setString('userEmail', email);
         await prefs.setString('userRole', userRole);
+        await prefs.setString('name', data['name'] ?? 'Student'); // Save the user's name
 
+        // Show a welcome toast
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Welcome, ${data['name'] ?? 'Student'}!'),
+            backgroundColor: Colors.green,
+          ),
+        );
+
+        // Show success animation before navigating
+        showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (context) => Center(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(Icons.check_circle, size: 80, color: Colors.green),
+                SizedBox(height: 20),
+                Text(
+                  'Login Successful!',
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black),
+                ),
+              ],
+            ),
+          ),
+        );
+
+        // Small delay to show success animation
+        await Future.delayed(Duration(seconds: 1));
+
+        // After animation, navigate to dashboard
+        Navigator.of(context).pop(); // Close the success dialog
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
@@ -88,7 +121,7 @@ class _LoginScreenState extends State<LoginScreen> {
         height: double.infinity,
         decoration: BoxDecoration(
           gradient: LinearGradient(
-            colors: [Colors.indigo, Colors.lightBlueAccent],
+            colors: [Colors.indigo, Colors.blueAccent],
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
           ),
@@ -97,114 +130,119 @@ class _LoginScreenState extends State<LoginScreen> {
           child: Center(
             child: SingleChildScrollView(
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 10),
-                child: Container(
-                  padding: EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.9),
-                    borderRadius: BorderRadius.circular(15),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black26,
-                        blurRadius: 8,
-                        offset: Offset(0, 2),
-                      ),
-                    ],
-                  ),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      SizedBox(height: 10),
-                      Center(
-                        child: Text(
-                          'Online Exam System',
-                          style: TextStyle(
-                            fontSize: 26,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.indigo,
-                            shadows: [
-                              Shadow(
-                                color: Colors.black26,
-                                offset: Offset(1, 1),
-                                blurRadius: 2,
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                      SizedBox(height: 30),
-                      TextField(
-                        controller: emailController,
-                        decoration: InputDecoration(
-                          labelText: 'Email',
-                          labelStyle: TextStyle(color: Colors.indigo),
-                          border: OutlineInputBorder(),
-                          prefixIcon: Icon(Icons.email, color: Colors.indigo),
-                        ),
-                      ),
-                      SizedBox(height: 15),
-                      TextField(
-                        controller: passwordController,
-                        obscureText: _obscurePassword,
-                        decoration: InputDecoration(
-                          labelText: 'Password',
-                          labelStyle: TextStyle(color: Colors.indigo),
-                          border: OutlineInputBorder(),
-                          prefixIcon: Icon(Icons.lock, color: Colors.indigo),
-                          suffixIcon: IconButton(
-                            icon: Icon(
-                              _obscurePassword ? Icons.visibility_off : Icons.visibility,
-                              color: Colors.indigo,
+                padding: const EdgeInsets.symmetric(horizontal: 24),
+                child: TweenAnimationBuilder<double>(
+                  tween: Tween(begin: 0.8, end: 1.0),
+                  duration: Duration(milliseconds: 600),
+                  curve: Curves.easeOutBack,
+                  builder: (context, scale, child) {
+                    return Transform.scale(
+                      scale: scale,
+                      child: Container(
+                        padding: EdgeInsets.all(24),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.95),
+                          borderRadius: BorderRadius.circular(20),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black26,
+                              blurRadius: 12,
+                              offset: Offset(0, 6),
                             ),
-                            onPressed: () {
-                              setState(() {
-                                _obscurePassword = !_obscurePassword;
-                              });
-                            },
-                          ),
+                          ],
                         ),
-                      ),
-                      SizedBox(height: 20),
-                      isLoading
-                          ? CircularProgressIndicator(
-                              valueColor: AlwaysStoppedAnimation<Color>(Colors.indigo),
-                            )
-                          : ElevatedButton(
-                              onPressed: loginUser,
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.indigo,
-                                foregroundColor: Colors.white,
-                                minimumSize: Size(double.infinity, 50),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(10),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              'Online Exam System',
+                              style: TextStyle(
+                                fontSize: 30,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.indigo,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                            SizedBox(height: 30),
+                            TextField(
+                              controller: emailController,
+                              decoration: InputDecoration(
+                                labelText: 'Email',
+                                labelStyle: TextStyle(color: Colors.indigo),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(12),
                                 ),
-                                elevation: 5,
-                                shadowColor: Colors.indigoAccent,
+                                prefixIcon: Icon(Icons.email_outlined, color: Colors.indigo),
                               ),
-                              child: Text('Login', style: TextStyle(fontSize: 18)),
                             ),
-                      SizedBox(height: 10),
-                      TextButton(
-                        onPressed: () {
-                          Navigator.pushNamed(context, '/signup');
-                        },
-                        child: Text(
-                          "Don't have an account? Sign up",
-                          style: TextStyle(color: Colors.indigo.shade700),
+                            SizedBox(height: 20),
+                            TextField(
+                              controller: passwordController,
+                              obscureText: _obscurePassword,
+                              decoration: InputDecoration(
+                                labelText: 'Password',
+                                labelStyle: TextStyle(color: Colors.indigo),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                prefixIcon: Icon(Icons.lock_outline, color: Colors.indigo),
+                                suffixIcon: IconButton(
+                                  icon: Icon(
+                                    _obscurePassword ? Icons.visibility_off : Icons.visibility,
+                                    color: Colors.indigo,
+                                  ),
+                                  onPressed: () {
+                                    setState(() {
+                                      _obscurePassword = !_obscurePassword;
+                                    });
+                                  },
+                                ),
+                              ),
+                            ),
+                            SizedBox(height: 30),
+                            isLoading
+                                ? CircularProgressIndicator(
+                                    valueColor: AlwaysStoppedAnimation<Color>(Colors.indigo),
+                                  )
+                                : SizedBox(
+                                    width: double.infinity,
+                                    child: ElevatedButton(
+                                      onPressed: loginUser,
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: Colors.indigo,
+                                        padding: EdgeInsets.symmetric(vertical: 16),
+                                        textStyle: TextStyle(fontSize: 18),
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(12),
+                                        ),
+                                      ),
+                                      child: Text('Login', style: TextStyle(color: Colors.white),),
+                                    ),
+                                  ),
+                            SizedBox(height: 20),
+                            TextButton(
+                              onPressed: () {
+                                Navigator.pushNamed(context, '/signup');
+                              },
+                              child: Text(
+                                "Don't have an account? Sign up",
+                                style: TextStyle(color: Colors.indigo),
+                              ),
+                            ),
+                            TextButton(
+                              onPressed: () {
+                                Navigator.pushNamed(context, '/forgot_password');
+                              },
+                              child: Text(
+                                'Forgot Password?',
+                                style: TextStyle(color: Colors.indigo),
+                              ),
+                            ),
+                          ],
                         ),
                       ),
-                      TextButton(
-                        onPressed: () {
-                          Navigator.pushNamed(context, '/forgot_password');
-                        },
-                        child: Text(
-                          'Forgot Password?',
-                          style: TextStyle(color: Colors.indigo.shade700),
-                        ),
-                      ),
-                      SizedBox(height: 10),
-                    ],
-                  ),
+                    );
+                  },
                 ),
               ),
             ),

@@ -36,14 +36,41 @@ class _SplashScreenState extends State<SplashScreen> {
     return Scaffold(
       backgroundColor: Colors.blue.shade900,
       body: Center(
-        child: Text(
-          'Online Examination System',
-          style: TextStyle(
-            fontSize: 24,
-            fontWeight: FontWeight.bold,
-            color: Colors.white,
-            letterSpacing: 1.5,
-          ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.school,
+              size: 80,
+              color: Colors.lightBlueAccent,
+            ),
+            SizedBox(height: 20),
+            AnimatedOpacity(
+              opacity: 1.0,
+              duration: Duration(seconds: 2),
+              child: Text(
+                'Online Examination System',
+                style: TextStyle(
+                  fontSize: 28,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                  letterSpacing: 2,
+                  shadows: [
+                    Shadow(
+                      blurRadius: 10,
+                      color: Colors.lightBlueAccent,
+                      offset: Offset(2, 2),
+                    ),
+                  ],
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ),
+            SizedBox(height: 30),
+            CircularProgressIndicator(
+              valueColor: AlwaysStoppedAnimation<Color>(Colors.lightBlueAccent),
+            ),
+          ],
         ),
       ),
     );

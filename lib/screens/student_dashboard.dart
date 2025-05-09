@@ -1,29 +1,65 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-class StudentDashboard extends StatelessWidget {
+class StudentDashboard extends StatefulWidget {
+  @override
+  _StudentDashboardState createState() => _StudentDashboardState();
+}
+
+class _StudentDashboardState extends State<StudentDashboard> {
+  String studentName = 'Student';
+
+  @override
+  void initState() {
+    super.initState();
+    loadStudentName();
+  }
+
+  Future<void> loadStudentName() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      studentName = prefs.getString('name') ?? 'Student';
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       extendBodyBehindAppBar: true,
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        title: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(Icons.school, color: Colors.white),
-            SizedBox(width: 8),
-            Text('Student Dashboard', style: TextStyle(color: Colors.white)),
-          ],
-        ),
-        actions: [
-          IconButton(
-            icon: Icon(Icons.logout, color: Colors.white),
-            onPressed: () {
-              Navigator.pushReplacementNamed(context, '/login');
-            },
+      appBar: PreferredSize(
+        preferredSize: Size.fromHeight(60),
+        child: ClipRRect(
+          borderRadius: BorderRadius.vertical(bottom: Radius.circular(20)),
+          child: AppBar(
+            backgroundColor: Colors.white.withOpacity(0.1),
+            elevation: 0,
+            title: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(Icons.school, color: Colors.white),
+                SizedBox(width: 8),
+                Text('Student Dashboard', style: TextStyle(color: Colors.white)),
+              ],
+            ),
+            actions: [
+              IconButton(
+                icon: Icon(Icons.logout, color: Colors.white),
+                onPressed: () {
+                  Navigator.pushReplacementNamed(context, '/login');
+                },
+              ),
+            ],
+            flexibleSpace: Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [Colors.indigo, Colors.blueAccent],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+              ),
+            ),
           ),
-        ],
+        ),
       ),
       body: Container(
         width: double.infinity,
@@ -56,7 +92,7 @@ class StudentDashboard extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'Welcome Back, Student!',
+                              'Welcome Back, $studentName!',
                               style: TextStyle(
                                 fontSize: 22,
                                 fontWeight: FontWeight.bold,
@@ -119,7 +155,7 @@ class StudentDashboard extends StatelessWidget {
                     SizedBox(height: 30),
                     Divider(color: Colors.white38),
                     SizedBox(height: 30),
-                    buildCard(context, 'Need Help?', Icons.help_outline, '/support'),
+                    buildCard(context, 'Need Help?', Icons.help_outline, '/support_screen'),
                   ],
                 ),
               ),
@@ -132,12 +168,15 @@ class StudentDashboard extends StatelessWidget {
 
   Widget buildCard(BuildContext context, String title, IconData icon, String route) {
     return TweenAnimationBuilder<double>(
-      tween: Tween(begin: 1.0, end: 1.0),
-      duration: Duration(milliseconds: 300),
+      tween: Tween(begin: 0.9, end: 1.0),
+      duration: Duration(milliseconds: 600),
+      curve: Curves.easeOutBack,
       builder: (context, scale, child) {
         return Transform.scale(
           scale: scale,
           child: InkWell(
+            borderRadius: BorderRadius.circular(16),
+            splashColor: Colors.indigo.withOpacity(0.2),
             onTap: () async {
               try {
                 await Navigator.pushNamed(context, route);
@@ -154,9 +193,9 @@ class StudentDashboard extends StatelessWidget {
                 borderRadius: BorderRadius.circular(16),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black26,
-                    blurRadius: 10,
-                    offset: Offset(0, 4),
+                    color: Colors.black12,
+                    blurRadius: 12,
+                    offset: Offset(0, 6),
                   ),
                 ],
               ),
@@ -188,12 +227,15 @@ class StudentDashboard extends StatelessWidget {
 
   Widget buildQuizCard(BuildContext context) {
     return TweenAnimationBuilder<double>(
-      tween: Tween(begin: 1.0, end: 1.0),
-      duration: Duration(milliseconds: 500),
+      tween: Tween(begin: 0.9, end: 1.0),
+      duration: Duration(milliseconds: 600),
+      curve: Curves.easeOutBack,
       builder: (context, scale, child) {
         return Transform.scale(
           scale: scale,
           child: InkWell(
+            borderRadius: BorderRadius.circular(16),
+            splashColor: Colors.purpleAccent.withOpacity(0.2),
             onTap: () {
               Navigator.pushNamed(context, '/daily_quiz');
             },

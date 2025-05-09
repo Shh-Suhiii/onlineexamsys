@@ -10,7 +10,7 @@ class StartExamScreen extends StatefulWidget {
 }
 
 class _StartExamScreenState extends State<StartExamScreen> {
-  int currentQuestionIndex = 0;
+  int previousQuestionIndex = 0;
   Timer? _timer;
   int remainingTime = 60 * 5; // 5 minutes in seconds
 
@@ -22,6 +22,8 @@ class _StartExamScreenState extends State<StartExamScreen> {
   bool _isInit = true;
   bool _submitted = false;
   bool isAutoSubmitted = false;
+  int currentQuestionIndex = 0;
+  bool showCelebration = false;
 
   @override
   void initState() {
@@ -55,7 +57,7 @@ class _StartExamScreenState extends State<StartExamScreen> {
       }
       final examId = exam['exam_id'];
 
-      final response = await http.get(Uri.parse('https://aeab-2409-40d2-100c-306b-10c7-3851-9d3d-f5c.ngrok-free.app/get_questions/$examId'));
+      final response = await http.get(Uri.parse('https://09f6-152-58-96-35.ngrok-free.app/get_questions/$examId'));
 
       final body = response.body;
       print('Question fetch response: $body');
@@ -128,7 +130,7 @@ void submitExam() async {
 
   try {
     final response = await http.post(
-      Uri.parse('https://aeab-2409-40d2-100c-306b-10c7-3851-9d3d-f5c.ngrok-free.app/submit_result'),
+      Uri.parse('https://09f6-152-58-96-35.ngrok-free.app/submit_result'),
       headers: {'Content-Type': 'application/json'},
       body: jsonEncode({
         'exam_id': examId,
@@ -200,24 +202,20 @@ void submitExam() async {
       );
     }
 
-    var question = questions[currentQuestionIndex];
-    List<String> options = [
-      question['option_a'],
-      question['option_b'],
-      question['option_c'],
-      question['option_d'],
-    ];
 
     int minutes = remainingTime ~/ 60;
     int seconds = remainingTime % 60;
 
     return Scaffold(
+      backgroundColor: Color(0xFFF2F6FF),
       appBar: AppBar(
-        title: Text('Exam In Progress'),
+        title: Text('Exam In Progress', style: TextStyle(fontWeight: FontWeight.bold)),
+        centerTitle: true,
+        backgroundColor: Colors.lightBlue,
         actions: [
           Padding(
             padding: EdgeInsets.only(right: 16),
-            child: Center(child: Text('$minutes:${seconds.toString().padLeft(2, '0')}')),
+            child: Center(child: Text('$minutes:${seconds.toString().padLeft(2, '0')}', style: TextStyle(fontSize: 18))),
           ),
         ],
       ),
@@ -226,46 +224,154 @@ void submitExam() async {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text("Q${currentQuestionIndex + 1}: ${question['question']}", style: TextStyle(fontSize: 18)),
-            SizedBox(height: 20),
-            ...List.generate(options.length, (i) {
-              String option = options[i];
-              return RadioListTile<String>(
-                value: option,
-                groupValue: selectedAnswers[currentQuestionIndex],
-                title: Text(option),
-                onChanged: (value) {
-                  setState(() {
-                    selectedAnswers[currentQuestionIndex] = value!;
-                  });
+            SizedBox(
+              height: 16,
+            ),
+            TweenAnimationBuilder<double>(
+              tween: Tween<double>(
+                begin: 0,
+                end: (currentQuestionIndex + 1) / questions.length,
+              ),
+              duration: Duration(milliseconds: 400),
+              curve: Curves.easeInOut,
+              builder: (context, value, child) => LinearProgressIndicator(
+                value: value,
+                backgroundColor: Colors.grey[300],
+                valueColor: AlwaysStoppedAnimation<Color>(Colors.lightBlueAccent),
+                minHeight: 8,
+              ),
+            ),
+            SizedBox(
+              height: 24,
+            ),
+            Center(
+              child: Text(
+                'Question ${currentQuestionIndex + 1} of ${questions.length}',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.blueGrey,
+                ),
+              ),
+            ),
+            SizedBox(height: 12),
+            if (showCelebration)
+              Center(
+                child: Icon(Icons.celebration, size: 40, color: Colors.amber),
+              ),
+            Expanded(
+              child: AnimatedSwitcher(
+                duration: Duration(milliseconds: 500),
+                transitionBuilder: (Widget child, Animation<double> animation) {
+                  final offsetAnimation = Tween<Offset>(
+                    begin: Offset(currentQuestionIndex > previousQuestionIndex ? 1.0 : -1.0, 0),
+                    end: Offset.zero,
+                  ).animate(animation);
+                  return SlideTransition(
+                    position: offsetAnimation,
+                    child: child,
+                  );
                 },
-              );
-            }),
-            Spacer(),
+                child: Container(
+                  key: ValueKey(currentQuestionIndex),
+                  margin: EdgeInsets.symmetric(vertical: 12),
+                  padding: EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(16),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.grey.withOpacity(0.1),
+                        blurRadius: 8,
+                        offset: Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        "Q${currentQuestionIndex + 1}: ${questions[currentQuestionIndex]['question_text']}",
+                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+                      ),
+                      SizedBox(height: 12),
+                      ...[
+                        questions[currentQuestionIndex]['option_a'],
+                        questions[currentQuestionIndex]['option_b'],
+                        questions[currentQuestionIndex]['option_c'],
+                        questions[currentQuestionIndex]['option_d'],
+                      ].map((option) => Container(
+                            margin: EdgeInsets.symmetric(vertical: 6),
+                            child: RadioListTile<String>(
+                              value: option,
+                              groupValue: selectedAnswers[currentQuestionIndex],
+                              title: Text(option),
+                              activeColor: Colors.lightBlueAccent,
+                              onChanged: (value) {
+                                setState(() {
+                                  selectedAnswers[currentQuestionIndex] = value!;
+                                });
+                              },
+                            ),
+                          )),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            SizedBox(height: 20),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                ElevatedButton(
-                  onPressed: currentQuestionIndex > 0
-                      ? () => setState(() => currentQuestionIndex--)
-                      : null,
-                  child: Text('Previous'),
-                ),
-                ElevatedButton(
-                  onPressed: currentQuestionIndex < questions.length - 1
-                      ? () => setState(() => currentQuestionIndex++)
-                      : null,
-                  child: Text('Next'),
-                ),
+                if (currentQuestionIndex > 0)
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.blueAccent,
+                      padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                    ),
+                    onPressed: () {
+                      setState(() {
+                        previousQuestionIndex = currentQuestionIndex;
+                        currentQuestionIndex--;
+                      });
+                    },
+                    child: Text('Previous', style: TextStyle(color: Colors.white),),
+                  ),
+                if (currentQuestionIndex < questions.length - 1)
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.blueAccent,
+                      padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                    ),
+                    onPressed: () {
+                      setState(() {
+                        previousQuestionIndex = currentQuestionIndex;
+                        currentQuestionIndex++;
+                        if (currentQuestionIndex == questions.length - 1) {
+                          showCelebration = true;
+                          Future.delayed(Duration(seconds: 2), () {
+                            if (mounted) {
+                              setState(() {
+                                showCelebration = false;
+                              });
+                            }
+                          });
+                        }
+                      });
+                    },
+                    child: Text('Next', style: TextStyle(color: Colors.white),),
+                  ),
+                if (currentQuestionIndex == questions.length - 1)
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.green,
+                      padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                    ),
+                    onPressed: submitExam,
+                    child: Text('Submit Exam', style: TextStyle(color: Colors.white),),
+                  ),
               ],
             ),
-            SizedBox(height: 20),
-            Center(
-              child: ElevatedButton(
-                onPressed: submitExam,
-                child: Text('Submit Exam'),
-              ),
-            )
           ],
         ),
       ),
@@ -288,38 +394,104 @@ class ExamResultScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    double percentage = (correct / total) * 100;
+    IconData resultIcon;
+    String resultMessage;
+
+    if (percentage >= 80) {
+      resultIcon = Icons.emoji_events; // Trophy
+      resultMessage = "Outstanding performance!";
+    } else if (percentage >= 50) {
+      resultIcon = Icons.celebration; // Celebration
+      resultMessage = "Good job, keep going!";
+    } else {
+      resultIcon = Icons.fitness_center; // Motivation
+      resultMessage = "Don't give up, try again!";
+    }
+
     return Scaffold(
-      appBar: AppBar(title: Text('Exam Result')),
+      backgroundColor: Color(0xFFF2F6FF),
+      appBar: AppBar(
+        title: Text('Exam Result', style: TextStyle(fontWeight: FontWeight.bold)),
+        centerTitle: true,
+        backgroundColor: Colors.lightBlueAccent,
+      ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('You scored $correct out of $total', style: TextStyle(fontSize: 24)),
+            Icon(resultIcon, color: Colors.orange, size: 50),
             SizedBox(height: 10),
-            Text('Correct Answers: $correct'),
-            Text('Incorrect Answers: ${total - correct}'),
+            Text(
+              resultMessage,
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500, color: Colors.teal),
+              textAlign: TextAlign.center,
+            ),
+            SizedBox(height: 10),
+            Text(
+              'You scored $correct out of $total',
+              style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold),
+            ),
+            SizedBox(height: 10),
+            TweenAnimationBuilder<double>(
+              tween: Tween<double>(begin: 0, end: percentage),
+              duration: Duration(seconds: 2),
+              builder: (context, value, child) => Column(
+                children: [
+                  LinearProgressIndicator(
+                    value: value / 100,
+                    minHeight: 10,
+                    backgroundColor: Colors.grey[300],
+                    valueColor: AlwaysStoppedAnimation<Color>(
+                      percentage >= 50 ? Colors.green : Colors.red,
+                    ),
+                  ),
+                  SizedBox(height: 8),
+                  Text(
+                    '${value.toStringAsFixed(1)}%',
+                    style: TextStyle(fontSize: 18, color: Colors.grey[700]),
+                  ),
+                ],
+              ),
+            ),
             SizedBox(height: 20),
             Expanded(
               child: ListView.builder(
                 itemCount: questions.length,
                 itemBuilder: (context, index) {
                   final q = questions[index];
-                  return ListTile(
-                    title: Text("Q${index + 1}: ${q['question']}"),
-                    subtitle: Column(
+                  bool isCorrect = selectedAnswers[index] == q['correct_answer'];
+                  // Use question_text if available, else fallback to question or empty string
+                  final questionText = q['question_text'] ?? q['question'] ?? '';
+                  return Container(
+                    margin: EdgeInsets.symmetric(vertical: 8),
+                    padding: EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(12),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.grey.withOpacity(0.2),
+                          blurRadius: 6,
+                          offset: Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
+                        Text(
+                          "Q${index + 1}: ${questionText}",
+                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                        ),
+                        SizedBox(height: 6),
                         Text("Your Answer: ${selectedAnswers[index] ?? 'Not Answered'}"),
                         Text("Correct Answer: ${q['correct_answer']}"),
+                        SizedBox(height: 6),
                         Text(
-                          selectedAnswers[index] == q['correct_answer']
-                              ? "✅ Correct"
-                              : "❌ Incorrect",
+                          isCorrect ? "✅ Correct" : "❌ Incorrect",
                           style: TextStyle(
-                            color: selectedAnswers[index] == q['correct_answer']
-                                ? Colors.green
-                                : Colors.red,
+                            color: isCorrect ? Colors.green : Colors.red,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
@@ -328,6 +500,32 @@ class ExamResultScreen extends StatelessWidget {
                   );
                 },
               ),
+            ),
+            SizedBox(height: 10),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.lightBlueAccent,
+                    padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                  ),
+                  onPressed: () {
+                    Navigator.pop(context); // Retake Exam
+                  },
+                  child: Text('Retake Exam'),
+                ),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.green,
+                    padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                  ),
+                  onPressed: () {
+                    Navigator.popUntil(context, (route) => route.isFirst); // Go Home
+                  },
+                  child: Text('Go Home'),
+                ),
+              ],
             ),
           ],
         ),

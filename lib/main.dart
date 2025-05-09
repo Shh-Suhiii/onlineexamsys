@@ -1,15 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:onlineexamsys/screens/support/about_app_screen.dart';
 import 'package:onlineexamsys/screens/add_question_screen.dart';
 import 'package:onlineexamsys/screens/all_results_screen.dart';
 import 'package:onlineexamsys/screens/available_exams_screen.dart';
+import 'package:onlineexamsys/screens/support/contact_us_screen.dart';
 import 'package:onlineexamsys/screens/create_exam_screen.dart';
 import 'package:onlineexamsys/screens/daily_quiz_screen.dart';
 import 'package:onlineexamsys/screens/dashboard_screen.dart';
+import 'package:onlineexamsys/screens/support/faq_screen.dart';
+import 'package:onlineexamsys/screens/support/report_problem_screen.dart';
 import 'package:onlineexamsys/screens/signup_screen.dart';
 import 'package:onlineexamsys/screens/view_result_screen.dart';
 import 'package:onlineexamsys/screens/forgot_password_screen.dart';
 import 'screens/splash_screen.dart';
 import 'screens/login_screen.dart'; // Will create soon
+import 'package:onlineexamsys/screens/support/support_screen.dart';
 import 'package:onlineexamsys/screens/exam_instruction_screen.dart'
     as instruction;
 import 'package:onlineexamsys/screens/start_exam_screen.dart' as start;
@@ -48,6 +53,11 @@ class MyApp extends StatelessWidget {
         '/all_results': (context) => AllResultsScreen(),
         '/admin_stats': (context) => AdminStatsScreen(),
         '/daily_quiz': (context) => DailyQuizScreen(), // 👈 Add this line
+        '/support_screen': (context) => SupportScreen(),
+        '/faq_screen': (context) => FAQScreen(),
+'/contact_us_screen': (context) => ContactUsScreen(),
+'/report_problem_screen': (context) => ReportProblemScreen(),
+'/about_app_screen': (context) => AboutAppScreen(),
       },
     );
   }

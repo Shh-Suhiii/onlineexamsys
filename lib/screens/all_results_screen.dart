@@ -26,7 +26,7 @@ class _AllResultsScreenState extends State<AllResultsScreen> {
   Future<void> fetchAllResults() async {
     try {
       final response = await http.get(
-        Uri.parse('https://aeab-2409-40d2-100c-306b-10c7-3851-9d3d-f5c.ngrok-free.app/get_all_results'),
+        Uri.parse('https://09f6-152-58-96-35.ngrok-free.app/get_all_results'),
       );
 
       if (response.statusCode == 200) {
@@ -79,90 +79,155 @@ class _AllResultsScreenState extends State<AllResultsScreen> {
     ];
 
     return Scaffold(
-      appBar: AppBar(title: Text('All Student Results')),
-      body:
-          isLoading
-              ? Center(child: CircularProgressIndicator())
-              : Padding(
-                padding: const EdgeInsets.all(12.0),
-                child: Column(
-                  children: [
-                    // Filters
-                    Row(
-                      children: [
-                        Expanded(
-                          flex: 2,
-                          child: DropdownButtonFormField<String>(
-                            value: selectedExam,
-                            decoration: InputDecoration(
-                              labelText: 'Filter by Exam',
-                            ),
-                            items:
-                                examTitles.map((title) {
-                                  return DropdownMenuItem<String>(
-                                    value: title,
-                                    child: Text(title),
+      backgroundColor: Color(0xFFF2F6FF),
+      appBar: AppBar(
+        title: Text(
+          'All Student Results',
+          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 22),
+        ),
+        centerTitle: true,
+        backgroundColor: Colors.lightBlueAccent,
+        elevation: 4,
+      ),
+      body: isLoading
+          ? Center(child: CircularProgressIndicator())
+          : Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                children: [
+                  // Filters
+                  Card(
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                    color: Colors.white,
+                    elevation: 6,
+                    child: Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Column(
+                        children: [
+                          Row(
+                            children: [
+                              Flexible(
+                                flex: 2,
+                                child: DropdownButtonFormField<String>(
+                                  isExpanded: true,
+                                  value: selectedExam,
+                                  decoration: InputDecoration(
+                                    labelText: 'Filter by Exam',
+                                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                                  ),
+                                  items: examTitles.map((title) {
+                                    return DropdownMenuItem<String>(
+                                      value: title,
+                                      child: Text(title, overflow: TextOverflow.ellipsis),
+                                    );
+                                  }).toList(),
+                                  onChanged: (value) {
+                                    selectedExam = value!;
+                                    applyFilters();
+                                  },
+                                ),
+                              ),
+                              SizedBox(width: 10),
+                              Expanded(
+                                flex: 3,
+                                child: TextField(
+                                  controller: emailController,
+                                  decoration: InputDecoration(
+                                    labelText: 'Filter by Email',
+                                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                                  ),
+                                  onChanged: (value) => applyFilters(),
+                                ),
+                              ),
+                            ],
+                          ),
+                          SizedBox(height: 16),
+                          SizedBox(
+                            width: double.infinity,
+                            child: ElevatedButton.icon(
+                              onPressed: () async {
+                                final url = 'https://09f6-152-58-96-35.ngrok-free.app/download_results_pdf';
+                                if (await canLaunchUrl(Uri.parse(url))) {
+                                  await launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
+                                } else {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(content: Text('Could not launch PDF download')),
                                   );
-                                }).toList(),
-                            onChanged: (value) {
-                              selectedExam = value!;
-                              applyFilters();
-                            },
-                          ),
-                        ),
-                        SizedBox(width: 10),
-                        Expanded(
-                          flex: 3,
-                          child: TextField(
-                            controller: emailController,
-                            decoration: InputDecoration(
-                              labelText: 'Filter by Email',
+                                }
+                              },
+                              icon: Icon(Icons.download),
+                              label: Text('Download Results as PDF', style: TextStyle(color: Colors.white),),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.indigo,
+                                padding: EdgeInsets.symmetric(vertical: 14),
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                              ),
                             ),
-                            onChanged: (value) => applyFilters(),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
-                    SizedBox(height: 20),
-                    ElevatedButton.icon(
-                      onPressed: () async {
-                        final url = 'https://aeab-2409-40d2-100c-306b-10c7-3851-9d3d-f5c.ngrok-free.app/download_results_pdf';
-                        if (await canLaunchUrl(Uri.parse(url))) {
-                          await launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
-                        } else {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text('Could not launch PDF download')),
-                          );
-                        }
-                      },
-                      icon: Icon(Icons.download),
-                      label: Text('Download Results as PDF'),
-                    ),
-                    SizedBox(height: 20),
-                    // Result List
-                    Expanded(
-                      child:
-                          filteredResults.isEmpty
-                              ? Center(child: Text('No matching results'))
-                              : ListView.builder(
+                  ),
+                  SizedBox(height: 20),
+                  Divider(thickness: 1.5),
+                  SizedBox(height: 10),
+                  // Result List
+                  Expanded(
+                    child: filteredResults.isEmpty
+                        ? Center(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(Icons.search_off, size: 80, color: Colors.grey),
+                                SizedBox(height: 10),
+                                Text(
+                                  'No matching results found!',
+                                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500, color: Colors.grey),
+                                ),
+                              ],
+                            ),
+                          )
+                        : RefreshIndicator(
+                            onRefresh: fetchAllResults,
+                            child: TweenAnimationBuilder<double>(
+                              tween: Tween(begin: 0.8, end: 1.0),
+                              duration: Duration(milliseconds: 500),
+                              curve: Curves.easeOutBack,
+                              builder: (context, scale, child) {
+                                return Transform.scale(scale: scale, child: child);
+                              },
+                              child: ListView.builder(
                                 itemCount: filteredResults.length,
                                 itemBuilder: (context, index) {
                                   final r = filteredResults[index];
-                                  return ListTile(
-                                    title: Text(
-                                      '${r['title']} (${r['subject']})',
+                                  return Card(
+                                    margin: EdgeInsets.only(bottom: 16),
+                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                                    elevation: 4,
+                                    child: ListTile(
+                                      contentPadding: EdgeInsets.all(16),
+                                      title: Text(
+                                        '${r['title']} (${r['subject']})',
+                                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                                      ),
+                                      subtitle: Padding(
+                                        padding: const EdgeInsets.only(top: 8.0),
+                                        child: Text(
+                                          'Email: ${r['email']}\nScore: ${r['score']} / ${r['total_marks']}\nDate: ${r['submitted_at']}',
+                                          style: TextStyle(fontSize: 15),
+                                        ),
+                                      ),
+                                      isThreeLine: true,
                                     ),
-                                    subtitle: Text(
-                                      'Email: ${r['email']}\nScore: ${r['score']} / ${r['total_marks']}\nDate: ${r['submitted_at']}',
-                                    ),
-                                    isThreeLine: true,
                                   );
                                 },
                               ),
-                    ),
-                  ],
-                ),
+                            ),
+                          ),
+                  ),
+                ],
               ),
+            ),
     );
   }
 }

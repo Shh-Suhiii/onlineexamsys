@@ -27,7 +27,7 @@ class _SignupScreenState extends State<SignupScreen> {
     }
 
     // Connect with backend
-    final url = Uri.parse('https://aeab-2409-40d2-100c-306b-10c7-3851-9d3d-f5c.ngrok-free.app/signup');
+    final url = Uri.parse('https://09f6-152-58-96-35.ngrok-free.app/signup');
     try {
       final response = await http.post(
         url,
