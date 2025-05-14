@@ -68,7 +68,7 @@ class _CreateExamScreenState extends State<CreateExamScreen> {
 
     try {
       final response = await http.post(
-        Uri.parse('https://09f6-152-58-96-35.ngrok-free.app/create_exam'),
+        Uri.parse('http://127.0.0.1:5000/create_exam'),
         headers: {"Content-Type": "application/json"},
         body: jsonEncode({
           'title': titleController.text,

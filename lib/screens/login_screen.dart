@@ -23,7 +23,7 @@ class _LoginScreenState extends State<LoginScreen> {
     String email = emailController.text;
     String password = passwordController.text;
 
-    final url = Uri.parse('https://09f6-152-58-96-35.ngrok-free.app/login');
+    final url = Uri.parse('http://127.0.0.1:5000/login');
 
     try {
       final response = await http.post(

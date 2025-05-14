@@ -26,7 +26,7 @@ class _AdminStatsScreenState extends State<AdminStatsScreen> {
   }
 
   Future<void> fetchStats() async {
-    final url = Uri.parse('https://09f6-152-58-96-35.ngrok-free.app/admin_stats');
+    final url = Uri.parse('http://127.0.0.1:5000/admin_stats');
     try {
       final response = await http.get(url);
       if (response.statusCode == 200) {

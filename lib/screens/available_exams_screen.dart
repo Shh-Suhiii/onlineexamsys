@@ -21,7 +21,7 @@ class _AvailableExamsScreenState extends State<AvailableExamsScreen> {
 
   Future<void> fetchExams() async {
     try {
-      final response = await http.get(Uri.parse('https://09f6-152-58-96-35.ngrok-free.app/get_exams'));
+      final response = await http.get(Uri.parse('http://127.0.0.1:5000/get_exams'));
 
       if (response.statusCode == 200) {
         print('Raw response body: ${response.body}');

@@ -18,7 +18,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
 
     setState(() => isLoading = true);
 
-    final url = Uri.parse('https://09f6-152-58-96-35.ngrok-free.app/request_password_reset');
+    final url = Uri.parse('http://127.0.0.1:5000/request_password_reset');
     try {
       final response = await http.post(
         url,

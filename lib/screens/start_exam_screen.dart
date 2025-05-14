@@ -57,7 +57,7 @@ class _StartExamScreenState extends State<StartExamScreen> {
       }
       final examId = exam['exam_id'];
 
-      final response = await http.get(Uri.parse('https://09f6-152-58-96-35.ngrok-free.app/get_questions/$examId'));
+      final response = await http.get(Uri.parse('http://localhost:5000/get_questions/$examId'));
 
       final body = response.body;
       print('Question fetch response: $body');
@@ -130,7 +130,7 @@ void submitExam() async {
 
   try {
     final response = await http.post(
-      Uri.parse('https://09f6-152-58-96-35.ngrok-free.app/submit_result'),
+      Uri.parse('http://127.0.0.1:5000/submit_result'),
       headers: {'Content-Type': 'application/json'},
       body: jsonEncode({
         'exam_id': examId,

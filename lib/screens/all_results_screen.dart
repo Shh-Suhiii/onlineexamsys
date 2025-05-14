@@ -26,7 +26,7 @@ class _AllResultsScreenState extends State<AllResultsScreen> {
   Future<void> fetchAllResults() async {
     try {
       final response = await http.get(
-        Uri.parse('https://09f6-152-58-96-35.ngrok-free.app/get_all_results'),
+        Uri.parse('http://127.0.0.1:5000/get_all_results'),
       );
 
       if (response.statusCode == 200) {
@@ -146,7 +146,7 @@ class _AllResultsScreenState extends State<AllResultsScreen> {
                             width: double.infinity,
                             child: ElevatedButton.icon(
                               onPressed: () async {
-                                final url = 'https://09f6-152-58-96-35.ngrok-free.app/download_results_pdf';
+                                final url = 'http://127.0.0.1:5000/download_results_pdf';
                                 if (await canLaunchUrl(Uri.parse(url))) {
                                   await launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
                                 } else {

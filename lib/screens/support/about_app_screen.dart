@@ -37,7 +37,7 @@ class AboutAppScreen extends StatelessWidget {
                   SizedBox(height: 16),
                   Text(
                     'This application is designed to help students easily register, attempt, and track their exam performances online. '
-                    'We aim to provide a seamless and user-friendly online testing experience.',
+                    'We aim to provide a seamless and user-friendly online testing experience. This app is made by LOGICALFETCH group.',
                     style: TextStyle(fontSize: 16, color: Colors.black87),
                   ),
                 ],

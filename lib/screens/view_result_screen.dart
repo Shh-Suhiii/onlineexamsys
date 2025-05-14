@@ -25,7 +25,7 @@ class _ViewResultsScreenState extends State<ViewResultsScreen> {
     String email = prefs.getString('email') ?? 'anonymous@student.com';
 
     final response = await http.get(
-      Uri.parse('https://09f6-152-58-96-35.ngrok-free.app/get_results/$email'),
+      Uri.parse('http://127.0.0.1:5000/get_results/$email'),
     );
 
     if (response.statusCode == 200) {

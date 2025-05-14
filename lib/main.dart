@@ -13,7 +13,7 @@ import 'package:onlineexamsys/screens/signup_screen.dart';
 import 'package:onlineexamsys/screens/view_result_screen.dart';
 import 'package:onlineexamsys/screens/forgot_password_screen.dart';
 import 'screens/splash_screen.dart';
-import 'screens/login_screen.dart'; // Will create soon
+import 'screens/login_screen.dart'; 
 import 'package:onlineexamsys/screens/support/support_screen.dart';
 import 'package:onlineexamsys/screens/exam_instruction_screen.dart'
     as instruction;
